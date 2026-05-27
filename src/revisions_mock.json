@@ -1,0 +1,302 @@
+[
+    {
+        "revisionTitle": "Pre-finalni revize Dokumentu KN02/110/2001/01 k provedeni udrzby rizeni tlakovych senzoru SZY",
+        "revisionId": "0000028078",
+        "guid": "B051418C-0000-CF16-ABE8-1E2AB95B4EBB",
+        "revisionNumber": "1",
+        "revisionChangeNumber": "2",
+        "packageOrder": null,
+        "currentRevisionStatus": "STAV_ZAZNAM",
+        "document": {
+            "documentTitle": "26.9.1986-30.12.1986",
+            "documentId": "0004112879",
+            "guid": "500C3C8C-0000-C318-AF69-711D7960CE80",
+            "documentNumber": "PD38/COH/HVB1/001 \" ' \\  \\\"  \\\\  \\'",
+            "documentType": "CAZA",
+            "documentSubtype": "PRD",
+            "documentKind": "Z",
+            "currentDocumentStatus": "ULOZEN",
+            "author": null,
+            "facility": "EDU",
+            "documentVendorNumber": null,
+            "documentSheetNumber": null
+        },
+        "revisionPackage": {
+            "guid": null,
+            "packageId": null,
+            "packageLocation": null,
+            "packageLocationPlace": null
+        },
+        "categories": []
+    },
+    {
+        "revisionTitle": "3.1.1987-5.1.1988",
+        "revisionId": "0000030381",
+        "guid": "B051418C-0000-CB28-AA3B-FE31695E676A",
+        "revisionNumber": "0",
+        "revisionChangeNumber": "0",
+        "packageOrder": null,
+        "currentRevisionStatus": "STAV_ZAZNAM",
+        "document": {
+            "documentTitle": "3.1.1987-5.1.1988",
+            "documentId": "0004112885",
+            "guid": "500C3C8C-0000-C627-A680-E2BEF9D06AC2",
+            "documentNumber": "PD38/COH/HVB1/002",
+            "documentType": "CAZA",
+            "documentSubtype": "PRD",
+            "documentKind": "Z",
+            "currentDocumentStatus": "ULOZEN",
+            "author": null,
+            "facility": "EDU",
+            "documentVendorNumber": null,
+            "documentSheetNumber": null
+        },
+        "revisionPackage": {
+            "guid": null,
+            "packageId": null,
+            "packageLocation": null,
+            "packageLocationPlace": null
+        },
+        "categories": []
+    },
+    {
+        "revisionTitle": "20.12.1988-17.5.1989",
+        "revisionId": "0000036662",
+        "guid": "B051418C-0000-C731-90C6-F917DD0B27BD",
+        "revisionNumber": "0",
+        "revisionChangeNumber": "0",
+        "packageOrder": null,
+        "currentRevisionStatus": "STAV_ZAZNAM",
+        "document": {
+            "documentTitle": "20.12.1988-17.5.1989",
+            "documentId": "0004112886",
+            "guid": "600C3C8C-0000-C919-8AFD-53A800DEED6C",
+            "documentNumber": "PD38/COH/HVB1/003",
+            "documentType": "CAZA",
+            "documentSubtype": "PRD",
+            "documentKind": "Z",
+            "currentDocumentStatus": "ULOZEN",
+            "author": null,
+            "facility": "EDU",
+            "documentVendorNumber": null,
+            "documentSheetNumber": null
+        },
+        "revisionPackage": {
+            "guid": null,
+            "packageId": null,
+            "packageLocation": null,
+            "packageLocationPlace": null
+        },
+        "categories": []
+    },
+    {
+        "revisionTitle": "17.5.1989-20.10.1989",
+        "revisionId": "0000034294",
+        "guid": "B051418C-0000-C340-AFC8-0C8BFD8B3092",
+        "revisionNumber": "0",
+        "revisionChangeNumber": "0",
+        "packageOrder": null,
+        "currentRevisionStatus": "STAV_ZAZNAM",
+        "document": {
+            "documentTitle": "17.5.1989-20.10.1989",
+            "documentId": "0004112887",
+            "guid": "600C3C8C-0000-C72A-B8CA-AA2F7FE9AC77",
+            "documentNumber": "PD38/COH/HVB1/004",
+            "documentType": "CAZA",
+            "documentSubtype": "PRD",
+            "documentKind": "Z",
+            "currentDocumentStatus": "SKARTACE",
+            "author": null,
+            "facility": "EDU",
+            "documentVendorNumber": null,
+            "documentSheetNumber": null
+        },
+        "revisionPackage": {
+            "guid": null,
+            "packageId": null,
+            "packageLocation": null,
+            "packageLocationPlace": null
+        },
+        "categories": []
+    },
+    {
+        "revisionTitle": "20.10.1989-3.4.1990",
+        "revisionId": "0000024301",
+        "guid": "B051418C-0000-C152-9052-22C3E9461F02",
+        "revisionNumber": "0",
+        "revisionChangeNumber": "0",
+        "packageOrder": null,
+        "currentRevisionStatus": "STAV_ZAZNAM",
+        "document": {
+            "documentTitle": "20.10.1989-3.4.1990",
+            "documentId": "0004112888",
+            "guid": "600C3C8C-0000-CC39-ADC6-B51BA820344C",
+            "documentNumber": "PD38/COH/HVB1/005",
+            "documentType": "CAZA",
+            "documentSubtype": "PRD",
+            "documentKind": "Z",
+            "currentDocumentStatus": "ULOZEN",
+            "author": null,
+            "facility": "EDU",
+            "documentVendorNumber": null,
+            "documentSheetNumber": null
+        },
+        "revisionPackage": {
+            "guid": null,
+            "packageId": null,
+            "packageLocation": null,
+            "packageLocationPlace": null
+        },
+        "categories": []
+    },
+    {
+        "revisionTitle": "3.4.1990-26.9.1990",
+        "revisionId": "0000030862",
+        "guid": "B051418C-0000-CE6B-9AE8-C0F307DE6866",
+        "revisionNumber": "0",
+        "revisionChangeNumber": "0",
+        "packageOrder": null,
+        "currentRevisionStatus": "STAV_ZAZNAM",
+        "document": {
+            "documentTitle": "3.4.1990-26.9.1990",
+            "documentId": "0004112889",
+            "guid": "600C3C8C-0000-CC4C-8E7E-9FCD17B62734",
+            "documentNumber": "PD38/COH/HVB1/006",
+            "documentType": "CAZA",
+            "documentSubtype": "PRD",
+            "documentKind": "Z",
+            "currentDocumentStatus": "ULOZEN",
+            "author": null,
+            "facility": "EDU",
+            "documentVendorNumber": null,
+            "documentSheetNumber": null
+        },
+        "revisionPackage": {
+            "guid": null,
+            "packageId": null,
+            "packageLocation": null,
+            "packageLocationPlace": null
+        },
+        "categories": []
+    },
+    {
+        "revisionTitle": "26.9.1990-5.4.1991",
+        "revisionId": "0000029025",
+        "guid": "C051418C-0000-CA11-AEE9-F08BAAE9F350",
+        "revisionNumber": "0",
+        "revisionChangeNumber": "0",
+        "packageOrder": null,
+        "currentRevisionStatus": "STAV_ZAZNAM",
+        "document": {
+            "documentTitle": "26.9.1990-5.4.1991",
+            "documentId": "0004112893",
+            "guid": "600C3C8C-0000-CE56-AE03-7CA8DE88635E",
+            "documentNumber": "PD38/COH/HVB1/007",
+            "documentType": "CAZA",
+            "documentSubtype": "PRD",
+            "documentKind": "Z",
+            "currentDocumentStatus": "ULOZEN",
+            "author": null,
+            "facility": "EDU",
+            "documentVendorNumber": null,
+            "documentSheetNumber": null
+        },
+        "revisionPackage": {
+            "guid": null,
+            "packageId": null,
+            "packageLocation": null,
+            "packageLocationPlace": null
+        },
+        "categories": []
+    },
+    {
+        "revisionTitle": "5.4.1991-14.8.1991",
+        "revisionId": "0000035236",
+        "guid": "C051418C-0000-C92B-9E05-8A402FBBEB6E",
+        "revisionNumber": "0",
+        "revisionChangeNumber": "0",
+        "packageOrder": null,
+        "currentRevisionStatus": "STAV_ZAZNAM",
+        "document": {
+            "documentTitle": "5.4.1991-14.8.1991",
+            "documentId": "0004112896",
+            "guid": "600C3C8C-0000-CF6F-9693-24A2E1A8EA7B",
+            "documentNumber": "PD38/COH/HVB1/008",
+            "documentType": "CAZA",
+            "documentSubtype": "PRD",
+            "documentKind": "Z",
+            "currentDocumentStatus": "ULOZEN",
+            "author": null,
+            "facility": "EDU",
+            "documentVendorNumber": null,
+            "documentSheetNumber": null
+        },
+        "revisionPackage": {
+            "guid": null,
+            "packageId": null,
+            "packageLocation": null,
+            "packageLocationPlace": null
+        },
+        "categories": []
+    },
+    {
+        "revisionTitle": "14.8.1991-3.1.1992",
+        "revisionId": "0000027988",
+        "guid": "C051418C-0000-CF37-A22C-27ED4DD2459A",
+        "revisionNumber": "0",
+        "revisionChangeNumber": "0",
+        "packageOrder": null,
+        "currentRevisionStatus": "STAV_ZAZNAM",
+        "document": {
+            "documentTitle": "14.8.1991-3.1.1992",
+            "documentId": "0004112898",
+            "guid": "600C3C8C-0000-CF71-A23F-59A5A49248E6",
+            "documentNumber": "PD38/COH/HVB1/009",
+            "documentType": "CAZA",
+            "documentSubtype": "PRD",
+            "documentKind": "Z",
+            "currentDocumentStatus": "ULOZEN",
+            "author": null,
+            "facility": "EDU",
+            "documentVendorNumber": null,
+            "documentSheetNumber": null
+        },
+        "revisionPackage": {
+            "guid": null,
+            "packageId": null,
+            "packageLocation": null,
+            "packageLocationPlace": null
+        },
+        "categories": []
+    },
+    {
+        "revisionTitle": "3.1.1992-7.7.1992",
+        "revisionId": "0000022455",
+        "guid": "C051418C-0000-CC4A-B867-6C1B23FE06EE",
+        "revisionNumber": "0",
+        "revisionChangeNumber": "0",
+        "packageOrder": null,
+        "currentRevisionStatus": "STAV_ZAZNAM",
+        "document": {
+            "documentTitle": "3.1.1992-7.7.1992",
+            "documentId": "0004112900",
+            "guid": "600C3C8C-0000-C28D-9FC7-B1F49C34B3BD",
+            "documentNumber": "PD38/COH/HVB1/010",
+            "documentType": "CAZA",
+            "documentSubtype": "PRD",
+            "documentKind": "Z",
+            "currentDocumentStatus": "ULOZEN",
+            "author": null,
+            "facility": "EDU",
+            "documentVendorNumber": null,
+            "documentSheetNumber": null
+        },
+        "revisionPackage": {
+            "guid": null,
+            "packageId": null,
+            "packageLocation": null,
+            "packageLocationPlace": null
+        },
+        "categories": []
+    }
+]

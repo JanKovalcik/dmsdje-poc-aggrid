@@ -1,10 +1,11 @@
-import { ColumnMenuModule, ColumnsToolPanelModule, ContextMenuModule, DateFilterModule, NewFiltersToolPanelModule, NumberFilterModule, PaginationModule, ServerSideRowModelModule, TextFilterModule, type ColDef, type FilterWrapperParams, type GridReadyEvent, type IServerSideDatasource, type IServerSideGetRowsParams } from "ag-grid-enterprise";
+import { ColumnMenuModule, ColumnsToolPanelModule, ContextMenuModule, DateFilterModule, NewFiltersToolPanelModule, NumberFilterModule, PaginationModule, ServerSideRowModelModule, SetFilterModule, TextFilterModule, type ColDef, type FilterWrapperParams, type GridReadyEvent, type IServerSideDatasource, type IServerSideGetRowsParams, type SetFilterValuesFuncParams } from "ag-grid-enterprise";
 import { AgGridProvider, AgGridReact } from "ag-grid-react";
 import { useCallback, useMemo, useRef } from "react";
-import { searchDocumentRevisions } from "./apiClient";
+import { getRevisionStatusEnums, searchDocumentRevisions } from "./apiClient";
 import type { RevisionSearchResponse, RevisionsSearchPageableRequest } from "./types";
 
 const modules = [
+    SetFilterModule,
     DateFilterModule,
     TextFilterModule,
     NumberFilterModule,
@@ -16,9 +17,20 @@ const modules = [
     ServerSideRowModelModule
 ];
 
+const getRevisionStateEnumAsync = async (params: SetFilterValuesFuncParams) => {
+    try {
+        const revisionStatuses = await getRevisionStatusEnums();
+        params.success(revisionStatuses);
+
+    } catch (error) {
+        console.error('Chyba pri načítavaní stavov revízií:', error);
+        params.success([]);
+    }
+};
+
 const TestGridColumnFilter = () => {
     // ToDo: TU SI DOPLN TOKEN 
-    const jwtToken = "XXXX";
+    const jwtToken = "XXX";
 
     const pageTokenRef = useRef<string | null>(null);
 
@@ -26,14 +38,23 @@ const TestGridColumnFilter = () => {
         { field: 'revisionId', headerName: 'ID Revízie', sortable: true, filter: true },
         { field: 'revisionTitle', headerName: 'Názov Revízie', sortable: true, filter: true },
         { field: 'revisionNumber', headerName: 'Číslo Revízie', sortable: true, filter: true },
-        { field: 'currentRevisionStatus', headerName: 'Stav', sortable: true, filter: true },
         {
-            field: 'revisionDate', 
-            headerName: 'Datum', 
-            filter: true,
-            cellDataType: "dateTime", 
+            field: 'currentRevisionStatus',
+            headerName: 'Stav',
             sortable: true,
-        
+            filter: "agSetColumnFilter",
+            filterParams: {
+                values: getRevisionStateEnumAsync,
+                suppressClearModelOnRefreshValues: true,
+            }
+        },
+        {
+            field: 'revisionDate',
+            headerName: 'Datum',
+            filter: true,
+            cellDataType: "dateTime",
+            sortable: true,
+
         },
         {
             headerName: 'Druh dokument',

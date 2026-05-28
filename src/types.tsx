@@ -47,3 +47,8 @@ export interface RevisionCategory {
   code?: string;
   area?: string;
 }
+
+export interface RevisionStatus {
+  code?: string;
+  name?: string;
+}

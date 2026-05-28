@@ -98,5 +98,11 @@ export const getRevisionStatusEnums = async (
 
 ): Promise<string[]> => {
 
-  return [ "HISTORIE","STAV_ZAZNAM", "NAHRAZENA", "SCHVALOVANA" ];
+  return ["HISTORIE", "STAV_ZAZNAM", "NAHRAZENA", "SCHVALOVANA"];
+}
+
+export const getDocumentKindEnums = async (
+
+): Promise<string[]> => {
+  return ["R", "O", "Z"];
 }

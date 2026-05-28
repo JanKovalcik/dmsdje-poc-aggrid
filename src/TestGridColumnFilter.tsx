@@ -1,10 +1,11 @@
-import { ColumnMenuModule, ColumnsToolPanelModule, ContextMenuModule, DateFilterModule, NewFiltersToolPanelModule, NumberFilterModule, PaginationModule, ServerSideRowModelModule, SetFilterModule, TextFilterModule, type ColDef, type FilterWrapperParams, type GridReadyEvent, type IServerSideDatasource, type IServerSideGetRowsParams, type SetFilterValuesFuncParams } from "ag-grid-enterprise";
+import { ColumnMenuModule, ColumnsToolPanelModule, ContextMenuModule, DateFilterModule, MultiFilterModule, NewFiltersToolPanelModule, NumberFilterModule, PaginationModule, ServerSideRowModelModule, SetFilterModule, TextFilterModule, type ColDef, type FilterWrapperParams, type GridReadyEvent, type IServerSideDatasource, type IServerSideGetRowsParams, type SetFilterValuesFuncParams } from "ag-grid-enterprise";
 import { AgGridProvider, AgGridReact } from "ag-grid-react";
 import { useCallback, useMemo, useRef } from "react";
-import { getRevisionStatusEnums, searchDocumentRevisions } from "./apiClient";
+import { getDocumentKindEnums, getRevisionStatusEnums, searchDocumentRevisions } from "./apiClient";
 import type { RevisionSearchResponse, RevisionsSearchPageableRequest } from "./types";
 
 const modules = [
+    MultiFilterModule,
     SetFilterModule,
     DateFilterModule,
     TextFilterModule,
@@ -21,6 +22,17 @@ const getRevisionStateEnumAsync = async (params: SetFilterValuesFuncParams) => {
     try {
         const revisionStatuses = await getRevisionStatusEnums();
         params.success(revisionStatuses);
+
+    } catch (error) {
+        console.error('Chyba pri načítavaní stavov revízií:', error);
+        params.success([]);
+    }
+};
+
+const getDocumentKindEnumAsync = async (params: SetFilterValuesFuncParams) => {
+    try {
+        const documentKinds = await getDocumentKindEnums();
+        params.success(documentKinds);
 
     } catch (error) {
         console.error('Chyba pri načítavaní stavov revízií:', error);
@@ -61,7 +73,24 @@ const TestGridColumnFilter = () => {
             valueGetter: params => params.data?.document?.documentKind,
             colId: 'document.documentKind',
             sortable: true,
-            filter: true
+            filter: 'agMultiColumnFilter',
+            filterParams: {
+                filters: [
+                    {
+                        filter: "agTextColumnFilter",
+                        filterParams: {
+                            defaultOption: "equals",
+                        },
+                    },
+                    {
+                        filter: "agSetColumnFilter",
+                        filterParams: {
+                            values: getDocumentKindEnumAsync,
+                            suppressClearModelOnRefreshValues: true,
+                        },
+                    },
+                ],
+            }
         },
         {
             headerName: 'Číslo Dokumentu',

@@ -3,7 +3,7 @@ import type { RevisionsSearchPage, RevisionsSearchPageableRequest } from './type
 
 const getHeaders = (jwtToken: string) => ({
   'X-Correlation-Id': crypto.randomUUID(),
-  'X-JWT-Assertion': jwtToken
+  'Authorization': jwtToken
 });
 
 const fixAgGridDateFilters = (obj: any): any => {
@@ -24,18 +24,18 @@ const fixAgGridDateFilters = (obj: any): any => {
             let value = obj[key];
 
             // TOTO JE MIESTO, KDE SA DEJE KÚZLO:
-            // Ak narazíme na kľúč, v ktorom AG Grid drží dátum (dateFrom, dateTo)
-            // alebo ak ide o kľúč 'filter' a sme vo filtri typu 'date'
-            if (
-                (key === 'dateFrom' || key === 'dateTo' || (key === 'filter' && obj.filterType === 'date')) 
-                && typeof value === 'string' 
-                && value.includes(' ')
-            ) {
-                // Opravíme formát: "2026-01-01 01:01:01" -> "2026-01-01T01:01:01Z"
+            // Regulárny výraz hľadá presne formát "YYYY-MM-DD HH:mm:ss" ALEBO "YYYY-MM-DDTHH:mm:ss"
+            // \d{4} znamená 4 číslice, [ T] znamená medzeru alebo písmeno T
+            const dateRegex = /^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}$/;
+
+            if (typeof value === 'string' && dateRegex.test(value)) {
+                // Ak bola v texte medzera (Basic filter), nahradí ju za T.
+                // Ak tam už bolo T (Advanced filter), replace nič neurobí.
+                // Následne na koniec prilepí Z.
                 value = value.replace(' ', 'T') + 'Z';
             }
 
-            // Zavoláme rekurziu pre prípad, že vo vnútri sú ďalšie vnorené podmienky (condition1, atď.)
+            // Zavoláme rekurziu pre prípad, že vo vnútri sú ďalšie vnorené podmienky
             result[key] = fixAgGridDateFilters(value);
         }
     }

@@ -30,7 +30,7 @@ const getRevisionStateEnumAsync = async (params: SetFilterValuesFuncParams) => {
 };
 
 const TestGridAdvancedFilter = () => {
-    const jwtToken = "xxx";
+    const jwtToken = "XXX";
 
     const pageTokenRef = useRef<string | null>(null);
 

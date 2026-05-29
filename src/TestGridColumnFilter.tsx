@@ -1,7 +1,8 @@
 import { ColumnMenuModule, ColumnsToolPanelModule, ContextMenuModule, DateFilterModule, MultiFilterModule, NewFiltersToolPanelModule, NumberFilterModule, PaginationModule, ServerSideRowModelModule, SetFilterModule, TextFilterModule, type ColDef, type FilterWrapperParams, type GridReadyEvent, type IServerSideDatasource, type IServerSideGetRowsParams, type SetFilterValuesFuncParams } from "ag-grid-enterprise";
 import { AgGridProvider, AgGridReact } from "ag-grid-react";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { getDocumentKindEnums, getRevisionStatusEnums, searchDocumentRevisions } from "./apiClient";
+import FullTextSearchCustomFilter from "./FullTextSearchCustomFilter";
 import type { RevisionSearchResponse, RevisionsSearchPageableRequest } from "./types";
 
 const modules = [
@@ -45,8 +46,16 @@ const TestGridColumnFilter = () => {
     const jwtToken = "XXX";
 
     const pageTokenRef = useRef<string | null>(null);
+    const gridRef = useRef<AgGridReact<RevisionSearchResponse>>(null);
+    const [fullTextSearchFilter, setFullTextSearchFilter] = useState<string>('');
 
-    const columnDefs: ColDef<RevisionSearchResponse>[] = useMemo(() => [
+    const columnDefs: ColDef[] = useMemo(() => [
+        {
+            field: 'fullTextSearch',
+            hide: true,
+            filter: FullTextSearchCustomFilter,
+            suppressHeaderMenuButton: true,
+        },
         { field: 'revisionId', headerName: 'ID Revízie', sortable: true, filter: true },
         { field: 'revisionTitle', headerName: 'Názov Revízie', sortable: true, filter: true },
         { field: 'revisionNumber', headerName: 'Číslo Revízie', sortable: true, filter: true },
@@ -128,6 +137,7 @@ const TestGridColumnFilter = () => {
     const createServerSideDatasource = (): IServerSideDatasource => {
         return {
             getRows: async (params: IServerSideGetRowsParams) => {
+
                 const payload: RevisionsSearchPageableRequest = {
                     pageToken: pageTokenRef.current,
                     startRow: params.request.startRow ?? 0,
@@ -159,28 +169,78 @@ const TestGridColumnFilter = () => {
         event.api!.setGridOption("serverSideDatasource", ds)
     }, []);
 
+    const containerStyle = useMemo(() => ({ width: "100%", height: "100%" }), []);
+    const gridStyle = useMemo(() => ({ height: "100%", width: "100%" }), []);
+
+    const handleExternalSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const fulltextSearchNewValue = event.target.value;
+        setFullTextSearchFilter(event.target.value);
+
+        if (gridRef.current && gridRef.current.api) {
+            const api = gridRef.current.api;
+
+            // 1. Získame aktuálny filter model (všetky filtre, čo si užívateľ naklikal)
+            const currentModel = api.getFilterModel();
+
+            // 2. Ak používateľ niečo napísal, pridáme/aktualizujeme náš skrytý filter
+            if (fulltextSearchNewValue && fulltextSearchNewValue.trim() !== '') {
+                currentModel['fullTextSearch'] = {
+                    filterType: 'fulltextsearch',
+                    filter: fulltextSearchNewValue
+                };
+            } else {
+                // Ak input vymazal, náš filter z modelu odstránime
+                delete currentModel['fullTextSearch'];
+            }
+
+            // 3. Natlačíme nový model do AG Gridu.
+            // TOTO AUTOMATICKY VYVOLÁ getRows() SO SPRÁVNYMI DÁTAMI!
+            api.setFilterModel(currentModel);
+        }
+    };
+
     return (
         <div>
             <div>table</div>
             <div style={{ width: "100%", height: "500px" }}>
                 <AgGridProvider modules={modules} >
-                    <AgGridReact
-                        multiSortKey="ctrl"
-                        columnDefs={columnDefs}
-                        defaultColDef={defaultColDef}
-                        rowModelType="serverSide"
-                        cacheBlockSize={10}
-                        onGridReady={onGridReady}
+                    <div style={containerStyle}>
+                        <div className="test-container">
+                            <div className="test-header">
+                                <label>
+                                    <input
+                                        name="fullTextSearchInput"
+                                        id="fullTextSearchInput"
+                                        onChange={handleExternalSearchChange}
+                                    />
+                                    Full Text Search
+                                </label>
+                            </div>
+                        </div>
 
-                        pagination={true}
-                        paginationPageSize={10}
 
-                        suppressSetFilterByDefault={true}
+                        <div style={gridStyle}>
+                            <AgGridReact
+                                ref={gridRef}
 
-                    />
+                                multiSortKey="ctrl"
+                                columnDefs={columnDefs}
+                                defaultColDef={defaultColDef}
+                                rowModelType="serverSide"
+                                cacheBlockSize={10}
+                                onGridReady={onGridReady}
+
+                                pagination={true}
+                                paginationPageSize={10}
+
+                                suppressSetFilterByDefault={true}
+
+                            />
+                        </div>
+                    </div>
                 </AgGridProvider>
             </div>
-        </div>
+        </div >
     )
 }
 

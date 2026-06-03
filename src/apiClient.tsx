@@ -1,5 +1,5 @@
 import axios, { type AxiosResponse } from 'axios';
-import type { RevisionsSearchPage, RevisionsSearchPageableRequest } from './types';
+import type { PageCountResponse, RevisionsSearchPage, RevisionsSearchPageableRequest } from './types';
 
 const getHeaders = (jwtToken: string) => ({
   'X-Correlation-Id': crypto.randomUUID(),
@@ -78,6 +78,45 @@ export const searchDocumentRevisions = async (
   );
 
   return mapResponse(response);
+};
+
+export const searchDocumentRevisionsCount = async (
+  payload: RevisionsSearchPageableRequest,
+  jwtToken: string
+): Promise<PageCountResponse> => {
+  const response = await axios.post<PageCountResponse>(
+    '/v2/documents/revisions/search/count',
+    formatOutgoingPayload(payload),
+    { headers: getHeaders(jwtToken) }
+  );
+
+  return response.data;
+};
+
+export const searchDocumentRevisionsAdvancedCount = async (
+  payload: RevisionsSearchPageableRequest,
+  jwtToken: string
+): Promise<PageCountResponse> => {
+  const response = await axios.post<PageCountResponse>(
+    '/v2/documents/revisions/search/advanced/count',
+    formatOutgoingPayload(payload),
+    { headers: getHeaders(jwtToken) }
+  );
+
+  return response.data;
+};
+
+export const searchDocumentRevisionsAdvancedCountTotal = async (
+  payload: RevisionsSearchPageableRequest,
+  jwtToken: string
+): Promise<PageCountResponse> => {
+  const response = await axios.post<PageCountResponse>(
+    '/v2/documents/revisions/search/advanced/count/total',
+    formatOutgoingPayload(payload),
+    { headers: getHeaders(jwtToken) }
+  );
+
+  return response.data;
 };
 
 export const searchDocumentRevisionsAdvanced = async (

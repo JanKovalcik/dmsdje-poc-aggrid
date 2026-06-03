@@ -1,9 +1,9 @@
 import { ColumnMenuModule, ColumnsToolPanelModule, ContextMenuModule, DateFilterModule, MultiFilterModule, NewFiltersToolPanelModule, NumberFilterModule, PaginationModule, ServerSideRowModelModule, SetFilterModule, TextFilterModule, type ColDef, type FilterWrapperParams, type GridReadyEvent, type IServerSideDatasource, type IServerSideGetRowsParams, type SetFilterValuesFuncParams } from "ag-grid-enterprise";
 import { AgGridProvider, AgGridReact } from "ag-grid-react";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { getDocumentKindEnums, getRevisionStatusEnums, searchDocumentRevisions } from "./apiClient";
+import { getDocumentKindEnums, getRevisionStatusEnums, searchDocumentRevisions, searchDocumentRevisionsCount } from "./apiClient";
 import FullTextSearchCustomFilter from "./FullTextSearchCustomFilter";
-import type { RevisionSearchResponse, RevisionsSearchPageableRequest } from "./types";
+import type { AgGridProps, RevisionSearchResponse, RevisionsSearchPageableRequest } from "./types";
 
 const modules = [
     MultiFilterModule,
@@ -41,13 +41,14 @@ const getDocumentKindEnumAsync = async (params: SetFilterValuesFuncParams) => {
     }
 };
 
-const TestGridColumnFilter = () => {
-    // ToDo: TU SI DOPLN TOKEN 
-    const jwtToken = "XXX";
+const TestGridColumnFilter = ({ jwtToken }: AgGridProps) => {
 
     const pageTokenRef = useRef<string | null>(null);
+    const totalCountRef = useRef<number | undefined>(undefined);
     const gridRef = useRef<AgGridReact<RevisionSearchResponse>>(null);
     const [fullTextSearchFilter, setFullTextSearchFilter] = useState<string>('');
+    const [facilityFilter, setFacilityFilter] = useState<string | null>('EDU');
+    const [facilityUnitsFilter, setFacilityUnitsFilter] = useState<string[]>([]);
 
     const columnDefs: ColDef[] = useMemo(() => [
         {
@@ -55,6 +56,16 @@ const TestGridColumnFilter = () => {
             hide: true,
             filter: FullTextSearchCustomFilter,
             suppressHeaderMenuButton: true,
+        },
+        {
+            field: 'facility',
+            hide: true,
+            filter: 'agTextColumnFilter'
+        },
+        {
+            field: 'facilityUnits',
+            hide: true,
+            filter: 'agSetColumnFilter'
         },
         { field: 'revisionId', headerName: 'ID Revízie', sortable: true, filter: true },
         { field: 'revisionTitle', headerName: 'Názov Revízie', sortable: true, filter: true },
@@ -137,6 +148,7 @@ const TestGridColumnFilter = () => {
     const createServerSideDatasource = (): IServerSideDatasource => {
         return {
             getRows: async (params: IServerSideGetRowsParams) => {
+                console.log("volam Get Rows");
 
                 const payload: RevisionsSearchPageableRequest = {
                     pageToken: pageTokenRef.current,
@@ -149,13 +161,29 @@ const TestGridColumnFilter = () => {
                 try {
                     const responseData = await searchDocumentRevisions(payload, jwtToken);
 
+                    let totalCount;
+                    if (totalCountRef.current == undefined) {
+                        const totalCountResponse = await searchDocumentRevisionsCount(payload, jwtToken);
+                        totalCount = totalCountResponse.totalCount
+                        totalCountRef.current = totalCount;
+
+                        // FIXME: JKO
+                        // totalCountRef.current = undefined;
+                    } else {
+                        console.log("Total count " + totalCountRef.current)
+                        totalCount = totalCountRef.current;
+                    }
+
+
                     pageTokenRef.current = responseData.pageToken ?? null;
 
                     params.success({
                         rowData: responseData.rowData,
                         // rowCount: 100
                         // rowCount: responseData.lastRow // ToDo: JKO fixni celkovy pocet
+                        rowCount: totalCount
                     });
+
                 } catch (error) {
                     console.error('Chyba komunikácie s be4fe backendom:', error);
                     params.fail();
@@ -165,82 +193,169 @@ const TestGridColumnFilter = () => {
     };
 
     const onGridReady = useCallback((event: GridReadyEvent) => {
+        const api = event.api!;
+        api.setFilterModel({
+            facility: {
+                filterType: 'text',
+                type: 'equals',
+                filter: 'EDU' // Naša počiatočná hodnota
+            }
+        });
+
         const ds = createServerSideDatasource();
         event.api!.setGridOption("serverSideDatasource", ds)
     }, []);
 
-    const containerStyle = useMemo(() => ({ width: "100%", height: "100%" }), []);
-    const gridStyle = useMemo(() => ({ height: "100%", width: "100%" }), []);
+    const onAgGridFilterChanged = useCallback((params: any) => {
+        console.log('Filter sa zmenil, resetujem totalCountRef...');
 
-    const handleExternalSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const fulltextSearchNewValue = event.target.value;
-        setFullTextSearchFilter(event.target.value);
+        totalCountRef.current = undefined;
+        pageTokenRef.current = null;
+    }, []);
+
+    const onExternalSearch = useCallback((params: any) => {
+        console.log('Pusti search')
 
         if (gridRef.current && gridRef.current.api) {
+            console.log('Pusti search a voja api')
             const api = gridRef.current.api;
 
             // 1. Získame aktuálny filter model (všetky filtre, čo si užívateľ naklikal)
             const currentModel = api.getFilterModel();
 
             // 2. Ak používateľ niečo napísal, pridáme/aktualizujeme náš skrytý filter
-            if (fulltextSearchNewValue && fulltextSearchNewValue.trim() !== '') {
+            if (fullTextSearchFilter && fullTextSearchFilter.trim() !== '') {
                 currentModel['fullTextSearch'] = {
                     filterType: 'fulltextsearch',
-                    filter: fulltextSearchNewValue
+                    filter: fullTextSearchFilter
                 };
             } else {
                 // Ak input vymazal, náš filter z modelu odstránime
                 delete currentModel['fullTextSearch'];
             }
 
+            if (facilityFilter && facilityFilter.trim() !== '') {
+                currentModel['facility'] = {
+                    filterType: 'text',
+                    type: 'equals',
+                    filter: facilityFilter
+                };
+            } else {
+                delete currentModel['facility'];
+            }
+
+            if (facilityUnitsFilter && facilityUnitsFilter.length > 0) {
+                console.log("pridavam facility units ")
+                currentModel['facilityUnits'] = {
+                    filterType: 'set',
+                    values: facilityUnitsFilter
+                };
+            } else {
+                console.log("mazem facility units ")
+                delete currentModel['facilityUnits'];
+            }
+
             // 3. Natlačíme nový model do AG Gridu.
             // TOTO AUTOMATICKY VYVOLÁ getRows() SO SPRÁVNYMI DÁTAMI!
             api.setFilterModel(currentModel);
         }
+    }, [fullTextSearchFilter, facilityFilter, facilityUnitsFilter]);
+
+    const containerStyle = useMemo(() => ({ width: "100%", height: "100%" }), []);
+    const gridStyle = useMemo(() => ({ height: "100%", width: "100%" }), []);
+
+    const onFulltextSearchInputChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setFullTextSearchFilter(event.target.value);
     };
 
+    const onFacilityInputChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const value = event.target.value;
+        setFacilityFilter(value === "" ? null : value);
+    };
+
+    const onFacilityUnitsInputChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const selectedOptions = event.target.selectedOptions;
+        const selectedValues = Array.from(selectedOptions, (option) => option.value);
+        setFacilityUnitsFilter(selectedValues);
+    };
+
+
     return (
-        <div>
-            <div>table</div>
-            <div style={{ width: "100%", height: "500px" }}>
-                <AgGridProvider modules={modules} >
-                    <div style={containerStyle}>
-                        <div className="test-container">
-                            <div className="test-header">
-                                <label>
-                                    <input
-                                        name="fullTextSearchInput"
-                                        id="fullTextSearchInput"
-                                        onChange={handleExternalSearchChange}
-                                    />
-                                    Full Text Search
-                                </label>
-                            </div>
+
+        <div style={{ width: "100%", height: "500px" }}>
+            <AgGridProvider modules={modules} >
+                <div style={containerStyle}>
+                    <div className="test-container">
+                        <div className="test-header">
+                            <label>
+                                <input
+                                    name="fullTextSearchInput"
+                                    id="fullTextSearchInput"
+                                    onChange={onFulltextSearchInputChanged}
+                                />
+                                Full Text Search
+                            </label>
                         </div>
+                        <div className="test-header">
+                            <label>
+                                Facility
+                                <select name="facilityFilterInput"
+                                    id="facilityFilterInput"
+                                    onChange={onFacilityInputChange}
+                                    value={facilityFilter || ""}>
+
+                                    <option>EDU</option>
+                                    <option>ETE</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div className="test-header">
+                            <label>
+                                Facility Units
+                                <select name="facilityUnitsFilterInput"
+                                    id="facilityUnitsFilterInput"
+                                    multiple={true}
+                                    onChange={onFacilityUnitsInputChange} >
 
 
-                        <div style={gridStyle}>
-                            <AgGridReact
-                                ref={gridRef}
-
-                                multiSortKey="ctrl"
-                                columnDefs={columnDefs}
-                                defaultColDef={defaultColDef}
-                                rowModelType="serverSide"
-                                cacheBlockSize={10}
-                                onGridReady={onGridReady}
-
-                                pagination={true}
-                                paginationPageSize={10}
-
-                                suppressSetFilterByDefault={true}
-
-                            />
+                                    <option>0</option>
+                                    <option>1</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div className="test-header">
+                            <button onClick={onExternalSearch}>
+                                Search
+                            </button>
                         </div>
                     </div>
-                </AgGridProvider>
-            </div>
-        </div >
+
+
+                    <div style={gridStyle}>
+                        <AgGridReact
+                            ref={gridRef}
+
+                            multiSortKey="ctrl"
+                            columnDefs={columnDefs}
+                            defaultColDef={defaultColDef}
+                            rowModelType="serverSide"
+                            cacheBlockSize={10}
+                            onGridReady={onGridReady}
+                            onFilterChanged={onAgGridFilterChanged}
+
+                            pagination={true}
+                            paginationPageSize={10}
+
+                            suppressSetFilterByDefault={true}
+
+                        />
+                    </div>
+                </div>
+            </AgGridProvider>
+        </div>
+
     )
 }
 

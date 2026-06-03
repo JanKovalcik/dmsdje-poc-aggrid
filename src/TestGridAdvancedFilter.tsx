@@ -1,8 +1,8 @@
 import { AdvancedFilterModule, ColumnMenuModule, ColumnsToolPanelModule, ContextMenuModule, DateFilterModule, NewFiltersToolPanelModule, NumberFilterModule, PaginationModule, ServerSideRowModelModule, SetFilterModule, TextFilterModule, type ColDef, type FilterWrapperParams, type GridReadyEvent, type IServerSideDatasource, type IServerSideGetRowsParams, type SetFilterValuesFuncParams } from "ag-grid-enterprise";
 import { AgGridProvider, AgGridReact } from "ag-grid-react";
 import { useCallback, useMemo, useRef } from "react";
-import { getRevisionStatusEnums, searchDocumentRevisionsAdvanced } from "./apiClient";
-import type { RevisionSearchResponse, RevisionsSearchPageableRequest } from "./types";
+import { getRevisionStatusEnums, searchDocumentRevisionsAdvanced, searchDocumentRevisionsAdvancedCountTotal } from "./apiClient";
+import type { AgGridProps, RevisionSearchResponse, RevisionsSearchPageableRequest } from "./types";
 
 const modules = [
     SetFilterModule,
@@ -25,14 +25,14 @@ const getRevisionStateEnumAsync = async (params: SetFilterValuesFuncParams) => {
 
     } catch (error) {
         console.error('Chyba pri načítavaní stavov revízií:', error);
-        params.success([]); 
+        params.success([]);
     }
 };
 
-const TestGridAdvancedFilter = () => {
-    const jwtToken = "XXX";
+const TestGridAdvancedFilter = ({ jwtToken }: AgGridProps) => {
 
     const pageTokenRef = useRef<string | null>(null);
+    const totalCountRef = useRef<number | undefined>(undefined);
 
     const columnDefs: ColDef<RevisionSearchResponse>[] = useMemo(() => [
         { field: 'revisionId', headerName: 'ID Revízie', sortable: true, filter: true },
@@ -112,10 +112,25 @@ const TestGridAdvancedFilter = () => {
 
                     pageTokenRef.current = responseData.pageToken ?? null;
 
+                    let totalCount;
+                    if (totalCountRef.current == undefined) {
+
+                        const totalCountResponse = await searchDocumentRevisionsAdvancedCountTotal(payload, jwtToken);
+
+                        totalCount = totalCountResponse.totalCount
+                        totalCountRef.current = totalCount;
+
+                        // FIXME: tu vypnes pocitanie total cout ak to dlho trva
+                        // totalCountRef.current = undefined;
+                    } else {
+                        console.log("Total count " + totalCountRef.current)
+                        totalCount = totalCountRef.current;
+                    }
+
                     params.success({
                         rowData: responseData.rowData,
                         // rowCount: 100
-                        // rowCount: responseData.lastRow // FIXME:
+                        rowCount: totalCount
                     });
                 } catch (error) {
                     console.error('Chyba komunikácie s be4fe backendom:', error);
@@ -130,27 +145,33 @@ const TestGridAdvancedFilter = () => {
         event.api!.setGridOption("serverSideDatasource", ds)
     }, []);
 
+    const onFilterChanged = useCallback((params: any) => {
+        console.log('Filter sa zmenil, resetujem totalCountRef...');
+
+        totalCountRef.current = undefined;
+        pageTokenRef.current = null;
+    }, []);
+
     return (
-        <div>
-            <div>table</div>
-            <div style={{ width: "100%", height: "500px" }}>
-                <AgGridProvider modules={modules} >
-                    <AgGridReact
-                        multiSortKey="ctrl"
-                        columnDefs={columnDefs}
-                        defaultColDef={defaultColDef}
-                        rowModelType="serverSide"
-                        cacheBlockSize={10}
-                        onGridReady={onGridReady}
 
-                        pagination={true}
-                        paginationPageSize={10}
+        <div style={{ width: "100%", height: "500px" }}>
+            <AgGridProvider modules={modules} >
+                <AgGridReact
+                    multiSortKey="ctrl"
+                    columnDefs={columnDefs}
+                    defaultColDef={defaultColDef}
+                    rowModelType="serverSide"
+                    cacheBlockSize={10}
+                    onGridReady={onGridReady}
+                    onFilterChanged={onFilterChanged}
 
-                        enableAdvancedFilter={true}
-                        suppressSetFilterByDefault={true}
-                    />
-                </AgGridProvider>
-            </div>
+                    pagination={true}
+                    paginationPageSize={10}
+
+                    enableAdvancedFilter={true}
+                    suppressSetFilterByDefault={true}
+                />
+            </AgGridProvider>
         </div>
     )
 }

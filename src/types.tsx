@@ -52,3 +52,11 @@ export interface RevisionStatus {
   code?: string;
   name?: string;
 }
+
+export interface PageCountResponse {
+  totalCount: number
+}
+
+export interface AgGridProps {
+  jwtToken: string
+}
